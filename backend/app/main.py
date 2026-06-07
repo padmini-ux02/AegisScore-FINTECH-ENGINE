@@ -1,6 +1,10 @@
 import os
 import sys
 import time
+from dotenv import load_dotenv
+
+# Load environment variables from .env file (must happen before config is imported)
+load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 
 # Add backend root and credit-card root directories to sys.path to allow absolute imports
 backend_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -138,6 +142,15 @@ def read_root():
         "app_name": settings.PROJECT_NAME,
         "api_version": "1.0.0",
         "documentation": "/docs"
+    }
+
+@app.get("/api/v1")
+@app.get("/api/v1/")
+def read_api_root():
+    return {
+        "status": "online",
+        "app_name": settings.PROJECT_NAME,
+        "api_version": "1.0.0"
     }
 
 if __name__ == "__main__":

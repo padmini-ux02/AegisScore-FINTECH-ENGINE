@@ -79,21 +79,34 @@ class APIClient {
     // Standard mock data for client testing
     if (endpoint.startsWith('/auth/login')) {
       const body = JSON.parse(options.body as string);
-      // Derive a display name from the email prefix (e.g. john.doe@... → John Doe)
-      const emailPrefix = body.email.split('@')[0] || 'User';
-      const derivedName = emailPrefix
-        .split(/[._-]/)
-        .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
-        .join(' ');
-      const isAdmin = body.email.toLowerCase().includes('admin');
-      const mockUser = {
-        id: 1,
-        email: body.email,
-        full_name: derivedName,
-        role: isAdmin ? 'admin' : 'user',
-        is_active: true,
-        created_at: new Date().toISOString()
-      };
+      
+      // Look up in registered mock users
+      let registeredUser: any = null;
+      if (typeof window !== 'undefined') {
+        const users = JSON.parse(localStorage.getItem('aegisscore_mock_users') || '[]');
+        registeredUser = users.find((u: any) => u.email.toLowerCase() === body.email.toLowerCase());
+      }
+      
+      let mockUser: any;
+      if (registeredUser) {
+        mockUser = { ...registeredUser };
+      } else {
+        const emailPrefix = body.email.split('@')[0] || 'User';
+        const derivedName = emailPrefix
+          .split(/[._-]/)
+          .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+          .join(' ');
+        const isAdmin = body.email.toLowerCase().includes('admin');
+        mockUser = {
+          id: 1,
+          email: body.email,
+          full_name: derivedName,
+          role: isAdmin ? 'admin' : 'user',
+          is_active: true,
+          created_at: new Date().toISOString()
+        };
+      }
+      
       // Persist so /auth/me can return the same user in offline mode
       if (typeof window !== 'undefined') {
         localStorage.setItem('aegisscore_mock_user', JSON.stringify(mockUser));
@@ -107,14 +120,24 @@ class APIClient {
 
     if (endpoint.startsWith('/auth/register')) {
       const body = JSON.parse(options.body as string);
-      return {
-        id: 2,
+      const newUser = {
+        id: Math.floor(Math.random() * 1000) + 10,
         email: body.email,
         full_name: body.full_name || 'New User',
         role: body.role || 'user',
         is_active: true,
         created_at: new Date().toISOString()
-      } as unknown as T;
+      };
+      
+      if (typeof window !== 'undefined') {
+        const users = JSON.parse(localStorage.getItem('aegisscore_mock_users') || '[]');
+        // Avoid duplicates
+        if (!users.some((u: any) => u.email.toLowerCase() === body.email.toLowerCase())) {
+          users.push(newUser);
+          localStorage.setItem('aegisscore_mock_users', JSON.stringify(users));
+        }
+      }
+      return newUser as unknown as T;
     }
 
     if (endpoint.startsWith('/auth/me')) {
@@ -322,10 +345,15 @@ class APIClient {
     }
 
     if (endpoint.startsWith('/admin/users')) {
-      return [
+      const mockUsers = [
         { id: 1, email: 'john.doe@creditguard.ai', full_name: 'John Doe (Simulator)', role: 'admin', is_active: true, created_at: '2026-06-01T12:00:00Z' },
         { id: 2, email: 'user@creditguard.ai', full_name: 'Standard User', role: 'user', is_active: true, created_at: '2026-06-03T15:30:00Z' }
-      ] as unknown as T;
+      ];
+      if (typeof window !== 'undefined') {
+        const registered = JSON.parse(localStorage.getItem('aegisscore_mock_users') || '[]');
+        return [...mockUsers, ...registered] as unknown as T;
+      }
+      return mockUsers as unknown as T;
     }
 
     if (endpoint.startsWith('/admin/audit-logs')) {

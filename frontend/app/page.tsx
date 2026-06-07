@@ -113,6 +113,13 @@ export default function DashboardHome() {
     setTriggerRefresh(prev => !prev);
   };
 
+  // Guard: if user is not logged in, force activeTab to be 'auth'
+  useEffect(() => {
+    if (!user && activeTab !== 'auth') {
+      setActiveTab('auth');
+    }
+  }, [user, activeTab]);
+
   // Inspect history record utility
   const handleSelectRecord = (record: any) => {
     setLastResult(record);
@@ -183,6 +190,7 @@ export default function DashboardHome() {
             <ReportsTab 
               result={lastResult} 
               onNavigate={setActiveTab} 
+              user={user}
             />
           )}
           {activeTab === 'history' && (

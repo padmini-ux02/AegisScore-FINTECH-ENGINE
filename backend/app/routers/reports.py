@@ -83,3 +83,5 @@ def download_csv(record_id: int, db: Session = Depends(get_db)):
         media_type="text/csv",
         headers={"Content-Disposition": f"attachment; filename=credit_report_{record_id}.csv"}
     )
+
+

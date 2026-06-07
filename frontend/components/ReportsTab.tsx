@@ -1,7 +1,16 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FileDown, FileText, Table, FileSpreadsheet, ShieldCheck, Download, Activity } from 'lucide-react';
+import { 
+  FileDown, 
+  FileText, 
+  Table, 
+  FileSpreadsheet, 
+  ShieldCheck, 
+  Download, 
+  Activity,
+  AlertCircle
+} from 'lucide-react';
 import { 
   ResponsiveContainer, 
   PieChart, 
@@ -13,9 +22,10 @@ import {
 interface ReportsTabProps {
   result: any;
   onNavigate: (tab: string) => void;
+  user?: any;
 }
 
-export default function ReportsTab({ result, onNavigate }: ReportsTabProps) {
+export default function ReportsTab({ result, onNavigate, user }: ReportsTabProps) {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -50,6 +60,8 @@ export default function ReportsTab({ result, onNavigate }: ReportsTabProps) {
   const score = result.credit_score || 600;
   const approvalPercent = Math.round((result.approval_probability || 0.5) * 100);
   const defaultPercent = Math.round((result.default_probability || 0.5) * 100);
+
+
 
   const getScoreColor = (score: number) => {
     if (score >= 800) return 'text-emerald-500';
@@ -305,6 +317,8 @@ export default function ReportsTab({ result, onNavigate }: ReportsTabProps) {
             <strong>Security Notice:</strong> AegisScore reports employ SHA-256 integrity hash verification and SQLite encryption logs to protect customer financial data vectors.
           </div>
         </div>
+
+
       </div>
 
     </div>
