@@ -18,7 +18,7 @@ import AuthTab from '../components/AuthTab';
 import { api } from '../lib/api';
 
 export default function DashboardHome() {
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('auth'); // Start on login page
   const [user, setUser] = useState<any>(null);
   const [lastResult, setLastResult] = useState<any>(null);
   const [triggerRefresh, setTriggerRefresh] = useState(false);
@@ -45,7 +45,7 @@ export default function DashboardHome() {
     return () => clearInterval(interval);
   }, []);
 
-  // 2. Load User session
+  // 2. Load User session — if token exists, restore and go to overview
   useEffect(() => {
     async function loadUser() {
       const token = localStorage.getItem('creditguard_token');
@@ -53,10 +53,15 @@ export default function DashboardHome() {
         try {
           const profile = await api.get<any>('/auth/me');
           setUser(profile);
+          setActiveTab('overview'); // returning user → skip login screen
         } catch {
           localStorage.removeItem('creditguard_token');
+          localStorage.removeItem('aegisscore_mock_user');
           setUser(null);
+          setActiveTab('auth');
         }
+      } else {
+        setActiveTab('auth'); // no session → show login
       }
     }
     loadUser();
@@ -99,7 +104,7 @@ export default function DashboardHome() {
     localStorage.removeItem('creditguard_token');
     localStorage.removeItem('aegisscore_mock_user');
     setUser(null);
-    setActiveTab('overview');
+    setActiveTab('auth'); // go back to login after logout
     setTriggerRefresh(prev => !prev);
   };
 
