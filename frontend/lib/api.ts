@@ -79,17 +79,29 @@ class APIClient {
     // Standard mock data for client testing
     if (endpoint.startsWith('/auth/login')) {
       const body = JSON.parse(options.body as string);
+      // Derive a display name from the email prefix (e.g. john.doe@... → John Doe)
+      const emailPrefix = body.email.split('@')[0] || 'User';
+      const derivedName = emailPrefix
+        .split(/[._-]/)
+        .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(' ');
+      const isAdmin = body.email.toLowerCase().includes('admin');
+      const mockUser = {
+        id: 1,
+        email: body.email,
+        full_name: derivedName,
+        role: isAdmin ? 'admin' : 'user',
+        is_active: true,
+        created_at: new Date().toISOString()
+      };
+      // Persist so /auth/me can return the same user in offline mode
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('aegisscore_mock_user', JSON.stringify(mockUser));
+      }
       return {
         access_token: 'mock-jwt-token-val',
         token_type: 'bearer',
-        user: {
-          id: 1,
-          email: body.email,
-          full_name: 'John Doe (Simulator)',
-          role: body.email.includes('admin') ? 'admin' : 'user',
-          is_active: true,
-          created_at: new Date().toISOString()
-        }
+        user: mockUser
       } as unknown as T;
     }
 
@@ -106,14 +118,15 @@ class APIClient {
     }
 
     if (endpoint.startsWith('/auth/me')) {
-      return {
-        id: 1,
-        email: 'john.doe@creditguard.ai',
-        full_name: 'John Doe (Simulator)',
-        role: 'admin',
-        is_active: true,
-        created_at: new Date().toISOString()
-      } as unknown as T;
+      // Return the user that was stored during mock login
+      if (typeof window !== 'undefined') {
+        const stored = localStorage.getItem('aegisscore_mock_user');
+        if (stored) {
+          try { return JSON.parse(stored) as unknown as T; } catch { /* fall through */ }
+        }
+      }
+      // Fallback: no session
+      throw new Error('No active session');
     }
 
     if (endpoint.startsWith('/predict/history')) {

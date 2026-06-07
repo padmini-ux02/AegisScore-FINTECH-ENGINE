@@ -97,6 +97,7 @@ export default function DashboardHome() {
 
   const handleLogout = () => {
     localStorage.removeItem('creditguard_token');
+    localStorage.removeItem('aegisscore_mock_user');
     setUser(null);
     setActiveTab('overview');
     setTriggerRefresh(prev => !prev);
