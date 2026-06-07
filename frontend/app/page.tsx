@@ -119,6 +119,20 @@ export default function DashboardHome() {
     setActiveTab('explainability');
   };
 
+  // Auth page: full-screen layout, no sidebar or header
+  if (activeTab === 'auth') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center relative overflow-hidden">
+        {/* Background glow orbs */}
+        <div className="absolute top-[-10%] left-[20%] w-[500px] h-[500px] bg-sky-500/10 rounded-full blur-[120px] pointer-events-none"></div>
+        <div className="absolute bottom-[-10%] right-[20%] w-[600px] h-[600px] bg-indigo-500/10 rounded-full blur-[140px] pointer-events-none"></div>
+        <div className="w-full max-w-4xl px-4">
+          <AuthTab onLoginSuccess={handleLoginSuccess} />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-slate-50 to-slate-200 dark:from-slate-950 dark:to-slate-900 transition-colors duration-300 relative overflow-hidden">
       {/* Background radial glow orbs for premium aesthetics */}
@@ -180,7 +194,6 @@ export default function DashboardHome() {
             />
           )}
           {activeTab === 'admin' && <AdminTab />}
-          {activeTab === 'auth' && <AuthTab onLoginSuccess={handleLoginSuccess} />}
         </div>
       </main>
 
