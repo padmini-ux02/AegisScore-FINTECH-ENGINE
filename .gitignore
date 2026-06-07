@@ -1,0 +1,69 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+ENV/
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+*.cover
+*.log
+
+# Environment files
+.env
+.env.*
+!.env.example
+*.env
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+.npm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# ML Models & Data (large files)
+ml/models/*.pkl
+ml/models/*.joblib
+ml/models/*.h5
+ml/data/raw/
+ml/data/processed/
+*.csv
+*.xlsx
+*.parquet
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml
+
+# Scratch / temp
+scratch/
+*.tmp
+*.bak
+
+# Test coverage
+coverage/
+.nyc_output/
